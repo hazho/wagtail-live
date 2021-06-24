@@ -11,5 +11,16 @@ markdown_extensions:
   - pymdownx.superfences
 nav:
   - Home: index.md
+  - Reference: reference.md
   - Development: development.md
   - Slack tutorial: getting_started/tutorial.md
+
+plugins:
+  - mkdocstrings:
+      handlers:
+        python:
+          setup_commands:
+            - import os
+            - import django
+            - os.environ.setdefault("DJANGO_SETTINGS_MODULE", "tests.settings")
+            - django.setup()

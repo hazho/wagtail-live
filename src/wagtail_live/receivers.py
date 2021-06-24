@@ -32,6 +32,11 @@ EMBED = "embed"
 LivePost = "live_post"
 
 
+def foo(value: str) -> bool:
+    """Always True."""
+    return True
+
+
 def is_embed(text: str) -> bool:
     """Checks if a text is a link to embed.
 
