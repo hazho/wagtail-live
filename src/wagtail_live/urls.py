@@ -13,10 +13,10 @@ urlpatterns = []
 
 try:
     live_publisher = get_live_publisher()
+    if hasattr(live_publisher, "get_urls"):
+        urlpatterns += live_publisher.get_urls()
 except ImproperlyConfigured as err:
     logger.error(f"{err}")
-else:
-    urlpatterns += live_publisher.get_urls()
 
 live_receiver = get_live_receiver()
 if live_receiver:
