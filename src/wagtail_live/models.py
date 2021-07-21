@@ -6,6 +6,7 @@ from wagtail.admin.edit_handlers import FieldPanel, StreamFieldPanel
 from wagtail.core.fields import StreamField
 
 from .blocks import LivePostBlock
+from .signals import live_page_update
 
 
 class LivePageMixin(models.Model):
@@ -133,6 +134,18 @@ class LivePageMixin(models.Model):
         self.last_updated_at = post_created_at
         self.save(clean=False)
 
+        live_post_id = self.get_live_post_by_index(lp_index).id
+        live_page_update.send(
+            sender=self.__class__,
+            channel_id=self.channel_id,
+            renders={
+                live_post_id: live_post.render_as_block(
+                    context={"block_id": live_post_id}
+                )
+            },
+            removals=[],
+        )
+
     def delete_live_post(self, message_id):
         """Deletes the live post corresponding to message_id.
 
@@ -147,10 +160,18 @@ class LivePageMixin(models.Model):
         if live_post_index is None:
             raise KeyError
 
+        live_post_id = self.live_posts[live_post_index].id
         del self.live_posts[live_post_index]
 
         self.last_updated_at = timezone.now()
         self.save(clean=False)
+
+        live_page_update.send(
+            sender=self.__class__,
+            channel_id=self.channel_id,
+            renders={},
+            removals=[live_post_id],
+        )
 
     def update_live_post(self, live_post):
         """Updates a live post when it has been edited.
@@ -160,6 +181,16 @@ class LivePageMixin(models.Model):
 
         live_post.value["modified"] = self.last_updated_at = timezone.now()
         self.save(clean=False)
+
+        live_post_id = live_post.id
+        live_page_update.send(
+            sender=self.__class__,
+            channel_id=self.channel_id,
+            renders={
+                live_post_id: live_post.render(context={"block_id": live_post_id})
+            },
+            removals=[],
+        )
 
     def get_updates_since(self, last_update_ts):
         """Retrieves new updates since a given timestamp value.
