@@ -13,6 +13,54 @@ from django.views import View
 from .utils import get_live_page_model, get_polling_interval, get_polling_timeout
 
 
+class BaseWebsocketsPublisher:
+    """Base class for publishers using the websockets technique."""
+
+    def send_update(self, channel_id, renders, removals):
+        """Sends a new update:
+        - to the websocket client for hosted websockets services
+        - to the consumers for django channels
+        - to an event bus for separate websockets servers
+
+        Args:
+            channel_id (str):
+                ID of the channel corresponding to the updated page
+            renders (dict):
+                Dict containing the new posts and the edited posts of the updated page
+            removals (list):
+                List containing the id of the deleted posts for the updated page
+
+        Returns:
+            (None)
+
+        Raises:
+            NotImplementedError
+        """
+
+        raise NotImplementedError
+
+    def publish(self, sender, channel_id, renders, removals, **kwargs):
+        """Listens to the live_page_update signal.
+
+        Args:
+            sender (LivePageMixin):
+                Sender of the signal
+            channel_id (str):
+                ID of the channel corresponding to the updated page
+            renders (dict):
+                Dict containing the new posts and the edited posts of the updated page
+            removals (list):
+                List containing the id of the deleted posts for the updated page
+
+        Returns:
+            (None)
+        """
+
+        return self.send_update(
+            channel_id=channel_id, renders=renders, removals=removals
+        )
+
+
 class PollingPublisherMixin(View):
     """A mixin for publishers using the polling technique.
 
