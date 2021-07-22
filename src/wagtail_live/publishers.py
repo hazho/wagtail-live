@@ -10,7 +10,11 @@ from django.shortcuts import get_object_or_404
 from django.urls import path
 from django.views import View
 
-from .utils import get_live_page_model, get_polling_interval, get_polling_timeout
+from wagtail_live.utils import (
+    get_live_page_model,
+    get_polling_interval,
+    get_polling_timeout,
+)
 
 
 class BaseWebsocketsPublisher:
@@ -59,6 +63,11 @@ class BaseWebsocketsPublisher:
         return self.send_update(
             channel_id=channel_id, renders=renders, removals=removals
         )
+
+    def get_updates_publisher(self):
+        """Helper to connect the publish method to the live_page_update signal."""
+
+        return self.publish
 
 
 class PollingPublisherMixin(View):

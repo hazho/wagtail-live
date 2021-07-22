@@ -18,7 +18,6 @@ from wagtail_live.utils import get_polling_interval
 def reload_urls():
     reload_urlconf()
     resolved = resolve("/wagtail_live/get-updates/test_channel/")
-
     assert resolved.url_name == "interval-polling"
 
 

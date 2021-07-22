@@ -5,8 +5,8 @@ from django.utils import timezone
 from wagtail.admin.edit_handlers import FieldPanel, StreamFieldPanel
 from wagtail.core.fields import StreamField
 
-from .blocks import LivePostBlock
-from .signals import live_page_update
+from wagtail_live.blocks import LivePostBlock
+from wagtail_live.signals import live_page_update
 
 
 class LivePageMixin(models.Model):

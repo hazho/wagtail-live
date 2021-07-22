@@ -22,7 +22,7 @@ def get_live_page_model():
         specified doesn't inherit from wagtail_live.models.LivePageMixin.
     """
 
-    from .models import LivePageMixin
+    from wagtail_live.models import LivePageMixin
 
     live_model = getattr(settings, "WAGTAIL_LIVE_PAGE_MODEL", "")
     if not live_model:
@@ -94,6 +94,12 @@ def get_live_publisher():
     publisher = getattr(module, publisher_name)
 
     return publisher
+
+
+def get_updates_publisher():
+    publisher = get_live_publisher()
+    if hasattr(publisher, "get_updates_publisher"):
+        return publisher().get_updates_publisher()
 
 
 def get_polling_timeout():
